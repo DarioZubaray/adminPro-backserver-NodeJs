@@ -5,9 +5,9 @@ var app = express();
 
 var Usuario = require('../models/usuario');
 
-// ==========================
+// ==================================================
 // Obtener todos los usuarios
-// ==========================
+// ==================================================
 app.get('/', (req, res, next) => {
 
     Usuario.find({},'nombre email img role').exec((err, usuarios) => {
@@ -26,9 +26,9 @@ app.get('/', (req, res, next) => {
     });
 });
 
-// ==========================
+// ==================================================
 // Crear un usuario nuevo
-// ==========================
+// ==================================================
 app.post('/', (req, res, next) => {
     var body = req.body;
 
@@ -55,9 +55,9 @@ app.post('/', (req, res, next) => {
     });
 });
 
-// ==========================
+// ==================================================
 // Actualizar un usuario existente
-// ==========================
+// ==================================================
 app.put('/:id', (req, res, next) => {
     var id = req.params.id;
     var body = req.body;
@@ -95,6 +95,35 @@ app.put('/:id', (req, res, next) => {
                 ok: true,
                 usuario: usuarioGuardado
             });
+        });
+    });
+});
+
+// ==================================================
+// Borrar usuario por el id
+// ==================================================
+app.delete('/:id', (req, res) => {
+    var id = req.params.id;
+
+    Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
+        if(err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al borrar usuario',
+                errors: err
+            });
+        }
+        if(!usuarioBorrado) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: 'No existe el usuario con el id ' + id,
+                errors: { message: 'Usuario inexistente para borrar'}
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            usuario: usuarioBorrado
         });
     });
 });
