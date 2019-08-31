@@ -55,4 +55,48 @@ app.post('/', (req, res, next) => {
     });
 });
 
+// ==========================
+// Actualizar un usuario existente
+// ==========================
+app.put('/:id', (req, res, next) => {
+    var id = req.params.id;
+    var body = req.body;
+
+    Usuario.findById( id, (err, usuarioEncontrado) => {
+        if(err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error usuario no encontrado',
+                errors: err
+            });
+        }
+        if(!usuarioEncontrado) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: `El usuario con el ${id} no existe`,
+                errors: {message: 'No existe un usuario con ese ID'}
+            });
+        }
+
+        usuarioEncontrado.nombre = body.nombre;
+        usuarioEncontrado.email = body.email;
+        usuarioEncontrado.role = body.role;
+
+        usuarioEncontrado.save( (err, usuarioGuardado) => {
+            if(err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Error al actualizar usuario',
+                    errors: err
+                });
+            }
+            usuarioGuardado.password = '=)';
+            res.status(200).json({
+                ok: true,
+                usuario: usuarioGuardado
+            });
+        });
+    });
+});
+
 module.exports = app;
