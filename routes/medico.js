@@ -11,20 +11,23 @@ var Medico = require('../models/medico');
 // ==================================================
 app.get('/',  (req, res, next) => {
 
-    Medico.find({}).exec((err, medicos) => {
-        if(err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error cargando medicos',
-                errors: err
-            });
-        }
+    Medico.find({})
+        .populate('usuario', 'nombre email')
+        .populate('hospital')
+        .exec((err, medicos) => {
+            if(err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando medicos',
+                    errors: err
+                });
+            }
 
-        res.status(200).json({
-            ok: true,
-            medicos
+            res.status(200).json({
+                ok: true,
+                medicos
+            });
         });
-    });
 });
 
 
@@ -80,6 +83,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res, next) => {
         }
 
         medicoEncontrado.nombre = body.nombre;
+        medicoEncontrado.usuario = req.usuario._id;
         medicoEncontrado.hospital = body.hospital;
 
         medicoEncontrado.save( (err, medicoGuardado) => {

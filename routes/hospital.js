@@ -10,7 +10,7 @@ var Hospital = require('../models/hospital');
 // ==================================================
 app.get('/', (req, res, next) => {
 
-    Hospital.find({}).exec((err, hospitales) => {
+    Hospital.find({}).populate('usuario', 'nombre email').exec((err, hospitales) => {
         if(err) {
             return res.status(500).json({
                 ok: false,
@@ -76,6 +76,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res, next) => {
         }
 
         hospitalEncontrado.nombre = body.nombre;
+        hospitalEncontrado.usuario = req.usuario._id;
 
         hospitalEncontrado.save( (err, hospitalGuardado) => {
             if(err) {
