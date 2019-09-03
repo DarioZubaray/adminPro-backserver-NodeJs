@@ -9,7 +9,17 @@ var app = express();
 var Usuario = require('../models/usuario');
 
 // ==================================================
-// Login
+// Login google
+// ==================================================
+app.post('/google', (req, res, next) => {
+    res.status(200).json({
+        ok: true,
+        mensaje: 'Primera peticion realizada correctamente'
+    });
+});
+
+// ==================================================
+// Login Autonomo
 // ==================================================
 
 app.post('/', (req, res) => {
