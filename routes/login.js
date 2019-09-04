@@ -22,12 +22,12 @@ async function verify(token) {
         // Or, if multiple clients access the backend:
         //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });
-    console.log(ticket);
+
     const payload = ticket.getPayload();
     // const userid = payload['sub'];
     // If request specified a G Suite domain:
     //const domain = payload['hd'];
-    console.log(payload);
+
     return {
         nombre: payload.name,
         email: payload.email,
