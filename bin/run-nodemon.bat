@@ -9,4 +9,4 @@ echo
 pushd ..
 
 nodemon app.js
-pause
+cmd /k

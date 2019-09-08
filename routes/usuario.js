@@ -14,34 +14,34 @@ app.get('/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Usuario.find({},'nombre email img role')
+    Usuario.find({}, 'nombre email img role google')
         .skip(desde)
         .limit(5)
         .exec((err, usuarios) => {
-        if(err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error cargando usuario',
-                errors: err
-            });
-        }
-
-        Usuario.count({}, (err, conteo) => {
-            if(err) {
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error cargando usuario',
                     errors: err
                 });
             }
-            res.status(200).json({
-                ok: true,
-                usuarios,
-                total: conteo
-            });
-        });
 
-    });
+            Usuario.count({}, (err, conteo) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando usuario',
+                        errors: err
+                    });
+                }
+                res.status(200).json({
+                    ok: true,
+                    usuarios,
+                    total: conteo
+                });
+            });
+
+        });
 });
 
 // ==================================================
@@ -58,8 +58,8 @@ app.post('/', (req, res, next) => {
         role: body.role
     });
 
-    usuario.save( (err, usuarioGuardado) => {
-        if(err) {
+    usuario.save((err, usuarioGuardado) => {
+        if (err) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Error al crear usuario',
@@ -80,19 +80,19 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res, next) => {
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById( id, (err, usuarioEncontrado) => {
-        if(err) {
+    Usuario.findById(id, (err, usuarioEncontrado) => {
+        if (err) {
             return res.status(500).json({
                 ok: false,
                 mensaje: 'Error usuario no encontrado',
                 errors: err
             });
         }
-        if(!usuarioEncontrado) {
+        if (!usuarioEncontrado) {
             return res.status(404).json({
                 ok: false,
                 mensaje: `El usuario con el ${id} no existe`,
-                errors: {message: 'No existe un usuario con ese ID'}
+                errors: { message: 'No existe un usuario con ese ID' }
             });
         }
 
@@ -100,8 +100,8 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res, next) => {
         usuarioEncontrado.email = body.email;
         usuarioEncontrado.role = body.role;
 
-        usuarioEncontrado.save( (err, usuarioGuardado) => {
-            if(err) {
+        usuarioEncontrado.save((err, usuarioGuardado) => {
+            if (err) {
                 return res.status(400).json({
                     ok: false,
                     mensaje: 'Error al actualizar usuario',
@@ -124,18 +124,18 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
     var id = req.params.id;
 
     Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
-        if(err) {
+        if (err) {
             return res.status(500).json({
                 ok: false,
                 mensaje: 'Error al borrar usuario',
                 errors: err
             });
         }
-        if(!usuarioBorrado) {
+        if (!usuarioBorrado) {
             return res.status(404).json({
                 ok: false,
                 mensaje: 'No existe el usuario con el id ' + id,
-                errors: { message: 'Usuario inexistente para borrar'}
+                errors: { message: 'Usuario inexistente para borrar' }
             });
         }
 
