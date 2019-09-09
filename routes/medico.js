@@ -67,7 +67,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res, next) => {
         }
         res.status(201).json({
             ok: true,
-            hospital: medicoGuardado
+            medico: medicoGuardado
         });
     });
 });
