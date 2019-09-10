@@ -76,7 +76,7 @@ app.post('/', (req, res, next) => {
 // ==================================================
 // Actualizar un usuario existente
 // ==================================================
-app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdminRole], (req, res, next) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdminOMismoUsuario], (req, res, next) => {
     var id = req.params.id;
     var body = req.body;
 
