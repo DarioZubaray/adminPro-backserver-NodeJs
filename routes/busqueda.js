@@ -29,8 +29,8 @@ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
         default:
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Los tipos de busuqeda solo son usuarios, medicos y hospitales',
-                errors: { message: 'tipo de coleccion no valido: ' + tabla }
+                mensaje: 'Los tipos de búsqueda sólo son usuarios, médicos y hospitales',
+                errors: { message: 'tipo de colección no válido: ' + tabla }
             });
     }
 
@@ -56,7 +56,7 @@ app.get('/todo/:busqueda', (req, res, next) => {
     var regex = new RegExp(busqueda, 'i');
 
     Promise.all([buscarHospitales(regex), buscarMedicos(regex), buscarUsuarios(regex)])
-        .then(respustas => {
+        .then(respuestas => {
             res.status(200).json({
                 ok: true,
                 hospitales: respuestas[0],
@@ -74,7 +74,7 @@ app.get('/todo/:busqueda', (req, res, next) => {
 function buscarHospitales(regex) {
     return new Promise((resolve, reject) => {
         Hospital.find({ nombre: regex })
-            .populate('usuario', 'nombre email')
+            .populate('usuario', 'nombre email img')
             .exec((err, hospitales) => {
                 if (err) {
                     reject('Error al buscar hospitales');
@@ -88,7 +88,7 @@ function buscarHospitales(regex) {
 function buscarMedicos(regex) {
     return new Promise((resolve, reject) => {
         Medico.find({ nombre: regex })
-            .populate('usuario', 'nombre email')
+            .populate('usuario', 'nombre email img')
             .populate('hospital')
             .exec((err, medicos) => {
                 if (err) {
@@ -103,7 +103,7 @@ function buscarMedicos(regex) {
 
 function buscarUsuarios(regex) {
     return new Promise((resolve, reject) => {
-        Usuario.find({}, 'nombre email role')
+        Usuario.find({}, 'nombre email img role')
             .or([{ 'nombre': regex }, { 'email': regex }])
             .exec((err, usuarios) => {
                 if (err) {
