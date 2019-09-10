@@ -8,9 +8,23 @@ var app = express();
 
 var Usuario = require('../models/usuario');
 
-const {OAuth2Client} = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 var CLIENT_ID = require('../config/config').CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
+
+var mdAutenticacion = require('../middlewares/autenticacion');
+// ==================================================
+// Renovar token
+// ==================================================
+app.get('/renuevatoken', mdAutenticacion.verificaToken, (req, res) => {
+
+    var token = jwt.sign({ usuario: req.usuario }, SEED, { expiresIn: 14400 });
+
+    res.status(200).json({
+        ok: true,
+        token
+    });
+});
 
 // ==================================================
 // Login google
@@ -18,7 +32,7 @@ const client = new OAuth2Client(CLIENT_ID);
 async function verify(token) {
     const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        audience: CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
         // Or, if multiple clients access the backend:
         //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });
@@ -36,10 +50,10 @@ async function verify(token) {
     }
 }
 
-app.post('/google', async (req, res, next) => {
+app.post('/google', async(req, res, next) => {
     var token = req.body.token;
 
-    var googleUser = await verify(token).catch( e => {
+    var googleUser = await verify(token).catch(e => {
         return res.status(403).json({
             ok: false,
             mensaje: 'Token no válido'
@@ -110,33 +124,33 @@ app.post('/google', async (req, res, next) => {
 app.post('/', (req, res) => {
     var body = req.body;
 
-    Usuario.findOne({email: body.email}, (err, usuarioDB) => {
-        if(err) {
+    Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
+        if (err) {
             return res.status(500).json({
                 ok: false,
                 mensaje: 'Error al buscar el usuario no',
                 errors: err
             });
         }
-        if(!usuarioDB) {
+        if (!usuarioDB) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Usuario o contraseña invalidos',
-                errors: {message: 'Credenciales invalida'}
+                errors: { message: 'Credenciales invalida' }
             });
         }
-        if(!bcrypt.compareSync(body.password, usuarioDB.password)) {
+        if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Usuario o contraseña invalidos',
-                errors: {message: 'Credenciales invalida'}
+                errors: { message: 'Credenciales invalida' }
             });
         }
 
         // crear un token
         usuarioDB.password = ';)';
-        var token = jwt.sign({ usuario: usuarioDB }, SEED, {expiresIn: 14400});
-        
+        var token = jwt.sign({ usuario: usuarioDB }, SEED, { expiresIn: 14400 });
+
 
         res.status(200).json({
             "ok": true,
@@ -149,33 +163,32 @@ app.post('/', (req, res) => {
     });
 });
 
-function obtenerMenu( role ) {
+function obtenerMenu(role) {
 
-    var menu = [
-        {
-          titulo: 'Principal',
-          icono: 'mdi mdi-gauge',
-          submenu: [
-            { titulo: 'Dashboard', url: '/dashboard' },
-            { titulo: 'ProgressBar', url: '/progress' },
-            { titulo: 'Graficos', url: '/graficas1' },
-            { titulo: 'Promesas', url: '/promesas' },
-            { titulo: 'Rxjs', url: '/rxjs' }
-          ]
+    var menu = [{
+            titulo: 'Principal',
+            icono: 'mdi mdi-gauge',
+            submenu: [
+                { titulo: 'Dashboard', url: '/dashboard' },
+                { titulo: 'ProgressBar', url: '/progress' },
+                { titulo: 'Graficos', url: '/graficas1' },
+                { titulo: 'Promesas', url: '/promesas' },
+                { titulo: 'Rxjs', url: '/rxjs' }
+            ]
         },
         {
-          titulo: 'Mantenimiento',
-          icono: 'mdi mdi-folder-lock-open',
-          submenu: [
-            // { titulo: 'Usuario', url: '/usuarios'},
-            { titulo: 'Medicos', url: '/medicos'},
-            { titulo: 'Hospitales', url: '/hospitales'},
-          ]
+            titulo: 'Mantenimiento',
+            icono: 'mdi mdi-folder-lock-open',
+            submenu: [
+                // { titulo: 'Usuario', url: '/usuarios'},
+                { titulo: 'Medicos', url: '/medicos' },
+                { titulo: 'Hospitales', url: '/hospitales' },
+            ]
         }
     ];
 
-    if ( role === 'ADMIN_ROLE') {
-        menu[1].submenu.unshift( { titulo: 'Usuario', url: '/usuarios'} );
+    if (role === 'ADMIN_ROLE') {
+        menu[1].submenu.unshift({ titulo: 'Usuario', url: '/usuarios' });
     }
 
     return menu;
